@@ -1,0 +1,19 @@
+receivers:
+  otlp:
+    protocols:
+      http:
+      grpc:
+
+exporters:
+  clickhouse:
+    endpoint: "http://127.0.0.1:8123"
+    database: "default"
+    logs_table_name: "otel_logs"
+    username: "default"
+    password: ""
+
+service:
+  pipelines:
+    logs:
+      receivers: [ otlp ]
+      exporters: [ clickhouse ]
