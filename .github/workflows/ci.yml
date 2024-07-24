@@ -28,13 +28,13 @@ jobs:
       - name: Lint Code Base
         uses: super-linter/super-linter@v6.7.0
         env:
-          # VALIDATE_JAVA: true
+          VALIDATE_JAVA: true
           VALIDATE_GOOGLE_JAVA_FORMAT: true
           # To report GitHub Actions status checks
           GITHUB_TOKEN: ${{ secrets.GH_TOKEN }}
 
   test:
-    name: Run Test
+    name: Test - Units & Integrations
     runs-on: ubuntu-latest
     # needs: [lint_and_check]
 
@@ -45,14 +45,10 @@ jobs:
         uses: actions/setup-java@v4
         with:
           java-version: 17
-          distribution: 'adopt'
+          distribution: "adopt"
 
-      - name: Cache the Maven packages to speed up build
-        uses: actions/cache@v4
-        with:
-          path: ~/.m2
-          key: ${{ runner.os }}-m2-${{ hashFiles('**/pom.xml') }}
-          restore-keys: ${{ runner.os }}-m2
+      - name: Maven Package
+        run: mvn -B clean package --file pom.xml -DskipTests
 
-      - name: Build project with Maven
-        run: mvn -B package --file pom.xml
+      - name: Maven Verify
+        run: mvn -B clean verify
