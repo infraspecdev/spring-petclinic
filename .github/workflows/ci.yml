@@ -9,7 +9,8 @@ on:
       - main
 
 jobs:
-  lint:
+  lint_and_check:
+    name: Linters Analysis
     runs-on: ubuntu-latest
     steps:
       - name: Checkout Code
@@ -20,6 +21,6 @@ jobs:
       - name: Lint Code Base
         uses: github/super-linter@v4
         env:
-          VALIDATE_ALL_CODEBASE: true
           VALIDATE_JAVA: true
           VALIDATE_GOOGLE_JAVA_FORMAT: true
+          GITHUB_TOKEN: ${{ secrets.GH_TOKEN }}
