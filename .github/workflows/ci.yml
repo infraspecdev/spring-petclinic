@@ -10,7 +10,7 @@ on:
   workflow_dispatch:
 
 env:
-  AWS-REGION: ap-south-1
+  AWS_REGION: ap-south-1
   ECR_REPOSITORY: petclinic
 
 jobs:
