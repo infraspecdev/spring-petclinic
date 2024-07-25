@@ -1,19 +1,25 @@
 receivers:
   otlp:
     protocols:
-      http:
       grpc:
-
+        endpoint: 0.0.0.0:4317
+      http:
+        endpoint: 0.0.0.0:4318
 exporters:
   clickhouse:
-    endpoint: "http://127.0.0.1:8123"
+    endpoint: "http://host.docker.internal:8123"
     database: "default"
     logs_table_name: "otel_logs"
     username: "default"
     password: ""
-
 service:
   pipelines:
+    traces:
+      receivers: [ otlp ]
+      exporters: [ clickhouse ]
+    metrics:
+      receivers: [ otlp ]
+      exporters: [ clickhouse ]
     logs:
       receivers: [ otlp ]
       exporters: [ clickhouse ]
