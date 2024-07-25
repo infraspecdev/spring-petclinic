@@ -15,6 +15,7 @@ jobs:
     with:
       ecr-repository: ${{ vars.ECR_REPOSITORY }}
       aws-region: ${{ vars.AWS_REGION }}
+      java-version: ${{ vars.JAVA_VERSION }}
     secrets:
       assume-role: ${{ secrets.CORE_GH_ROLE }}
       gh-token: ${{ secrets.GH_TOKEN }}
