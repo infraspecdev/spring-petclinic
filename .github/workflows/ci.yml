@@ -9,10 +9,6 @@ on:
       - main
   workflow_dispatch:
 
-env:
-  AWS_REGION: ap-south-1
-  ECR_REPOSITORY: petclinic
-
 jobs:
   lint_and_check:
     name: Linters Analysis
@@ -63,7 +59,7 @@ jobs:
     uses: infraspecdev/generic-workflows/.github/workflows/build.yml@main
     needs: test
     with:
-      ecr-repository: ${{ ECR_REPOSITORY }}
-      aws-region: ${{ AWS_REGION }}
+      ecr-repository: ${{ vars.ECR_REPOSITORY }}
+      aws-region: ${{ vars.AWS_REGION }}
     secrets:
       assume-role: ${{ secrets.CORE_GH_ROLE }}
