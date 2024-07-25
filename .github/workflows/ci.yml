@@ -9,6 +9,10 @@ on:
       - main
   workflow_dispatch:
 
+env:
+  ECS_SERVICE: petclinic
+  ECS_CLUSTER: alpha
+
 jobs:
   ci:
     uses: infraspecdev/generic-workflows/.github/workflows/maven-ci.yml@main
