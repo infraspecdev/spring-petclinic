@@ -16,6 +16,78 @@ jobs:
       ecr-repository: ${{ vars.ECR_REPOSITORY }}
       aws-region: ${{ vars.AWS_REGION }}
       java-version: ${{ vars.JAVA_VERSION }}
+      linting: false
     secrets:
       assume-role: ${{ secrets.CORE_GH_ROLE }}
       gh-token: ${{ secrets.GH_TOKEN }}
+
+  deploy:
+    runs-on: ubuntu-latest
+    needs: [ci]
+    permissions:
+      contents: read
+      id-token: write
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Configure AWS credentials
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+          role-to-assume: ${{ secrets.CORE_GH_ROLE }}
+          aws-region: ap-south-1
+
+      - name: Download task definition
+        run: |
+          aws ecs describe-task-definition --task-definition ${{ env.ECS_SERVICE }} --query taskDefinition > task-definition.json
+
+      - name: Get old task definition revision
+        id: old-task-revision
+        run: |
+          revision=$(aws ecs describe-services \
+            --cluster ${{ env.ECS_CLUSTER }} \
+            --services ${{ env.ECS_SERVICE }} \
+            --output json | jq -r '.services[] | select(.serviceName == "${{ env.ECS_SERVICE }}") | .taskDefinition | split(":")[-1]')
+          echo "::notice title=Current Revision::${revision}"
+          echo "revision=$revision" >> $GITHUB_OUTPUT
+
+      - name: Update image in task definition
+        id: updated-task-definition
+        uses: aws-actions/amazon-ecs-render-task-definition@v1
+        with:
+          task-definition: task-definition.json
+          container-name: ${{ env.ECS_SERVICE }}
+          image: ${{ needs.ci.outputs.image-tag }}
+
+      - name: Deploy ECS task definition
+        uses: aws-actions/amazon-ecs-deploy-task-definition@v1
+        with:
+          task-definition: ${{ steps.updated-task-definition.outputs.task-definition }}
+          service: ${{ env.ECS_SERVICE }}
+          cluster: ${{ env.ECS_CLUSTER }}
+          wait-for-service-stability: true
+
+      - name: Download newly deployed task definition
+        id: download-new-task-definition
+        run: |
+          aws ecs describe-task-definition --task-definition ${{ env.ECS_SERVICE }} --query taskDefinition > new-task-definition.json
+          echo "revision=$(cat new-task-definition.json | jq .revision)" >> $GITHUB_OUTPUT
+
+      - name: Get new task definition revision
+        id: new-task-revision
+        run: |
+          revision=$(aws ecs describe-services \
+            --cluster ${{ env.ECS_CLUSTER }} \
+            --services ${{ env.ECS_SERVICE }} \
+            --output json | jq -r '.services[] | select(.serviceName == "${{ env.ECS_SERVICE }}") | .taskDefinition | split(":")[-1]')
+          echo "::notice title=New Revision::${revision}"
+          echo "revision=$revision" >> $GITHUB_OUTPUT
+
+      - name: Check Deployment
+        run: |
+          if [[ ${{ steps.download-new-task-definition.outputs.revision }} != ${{ steps.new-task-revision.outputs.revision }} ]]; then
+            echo "Error deploying the current build. Rolling back to previous. Reach out to Devops Team for support."
+            aws ecs deregister-task-definition --task-definition ${{ env.ECS_SERVICE }}:${{ steps.download-new-task-definition.outputs.revision }}
+            exit 1
+          fi
