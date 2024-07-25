@@ -63,7 +63,7 @@ jobs:
     uses: infraspecdev/generic-workflows/.github/workflows/build.yml@main
     needs: test
     with:
-      ecr-repository: ${{ env.ECR_REPOSITORY }}
-      aws-region: ${{ env.AWS_REGION }}
+      ecr-repository: ${{ ECR_REPOSITORY }}
+      aws-region: ${{ AWS_REGION }}
     secrets:
       assume-role: ${{ secrets.CORE_GH_ROLE }}
