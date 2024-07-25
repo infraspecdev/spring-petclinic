@@ -7,7 +7,7 @@ receivers:
         endpoint: 0.0.0.0:4318
 exporters:
   clickhouse:
-    endpoint: "http://host.docker.internal:8123"
+    endpoint: "http://clickhouse.default.svc.cluster.local:8123"
     database: "default"
     logs_table_name: "otel_logs"
     username: "default"

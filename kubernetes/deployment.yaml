@@ -15,7 +15,10 @@ spec:
         app: petclinic
     spec:
       containers:
-      - name: petclinic
-        image: 471112575944.dkr.ecr.ap-south-1.amazonaws.com/petclinic:otel-2
-        ports:
-        - containerPort: 8080
+        - name: petclinic
+          image: 471112575944.dkr.ecr.ap-south-1.amazonaws.com/petclinic:otel-2
+          env:
+            - name: OTEL_EXPORTER_OTLP_ENDPOINT
+              value: "http://otelcol.default.svc.cluster.local:4318"
+          ports:
+            - containerPort: 8080
