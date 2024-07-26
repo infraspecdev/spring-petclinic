@@ -1,0 +1,33 @@
+name: Java CI
+
+on:
+  push:
+    branches:
+      - feat/gh-action
+  pull_request:
+    branches:
+      - main
+  workflow_dispatch:
+
+jobs:
+  ci:
+    uses: infraspecdev/generic-workflows/.github/workflows/maven-ci.yml@main
+    with:
+      ecr-repository: petclinic
+      aws-region: ap-south-1
+      java-version: 17
+      linting: false
+    secrets:
+      assume-role: ${{ secrets.CORE_GH_ROLE }}
+      gh-token: ${{ secrets.GH_TOKEN }}
+
+  cd:
+    uses: infraspecdev/generic-workflows/.github/workflows/deploy.yml@main
+    needs: [ci]
+    with:
+      ecs-cluster: alpha
+      ecs-service: petclinic
+      aws-region: ap-south-1
+      image-tag: ${{ needs.ci.outputs.image-tag }}
+    secrets:
+      assume-role: ${{ secrets.CORE_GH_ROLE }}
