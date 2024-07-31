@@ -16,7 +16,7 @@ spec:
     spec:
       containers:
         - name: petclinic
-          image: 471112575944.dkr.ecr.ap-south-1.amazonaws.com/petclinic:otel-2
+          image: 471112575944.dkr.ecr.ap-south-1.amazonaws.com/petclinic:otel-10
           env:
             - name: OTEL_EXPORTER_OTLP_ENDPOINT
               value: "http://otelcol.default.svc.cluster.local:4318"
