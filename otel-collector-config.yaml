@@ -6,6 +6,8 @@ receivers:
       http:
         endpoint: 0.0.0.0:4318
 exporters:
+  debug:
+    verbosity: detailed
   clickhouse:
     endpoint: "http://clickhouse.default.svc.cluster.local:8123"
     database: "default"
@@ -16,10 +18,10 @@ service:
   pipelines:
     traces:
       receivers: [ otlp ]
-      exporters: [ clickhouse ]
+      exporters: [ debug, clickhouse ]
     metrics:
       receivers: [ otlp ]
-      exporters: [ clickhouse ]
+      exporters: [ debug, clickhouse ]
     logs:
       receivers: [ otlp ]
-      exporters: [ clickhouse ]
+      exporters: [ debug, clickhouse ]
