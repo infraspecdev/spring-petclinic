@@ -1,0 +1,35 @@
+data_dir = "./vector-data-dir"
+
+[sources.demo-logs]
+type = "demo_logs"
+format = "json"
+
+[transforms.restructure-json]
+type = "remap"
+inputs = ["demo-logs"]
+source = '''
+body = .
+serviceName = .service
+vector_timestamp = format_timestamp!(.timestamp, "%Y-%m-%d %H:%M:%S%.9f")
+. = {}
+.Body = body
+.ServiceName = serviceName
+del(.Body.service)
+.Timestamp = vector_timestamp
+del(.Body.timestamp)
+'''
+
+[sinks.console-sink]
+type = "console"
+inputs = ["restructure-json"]
+encoding.codec = "json"
+
+[sinks.clickhouse-sink]
+type = "clickhouse"
+inputs = ["restructure-json"]
+endpoint = "http://localhost:8123"
+table = "otel_logs"
+database = "default"
+auth.strategy = "basic"
+auth.password = "<password>"
+auth.user = "default"

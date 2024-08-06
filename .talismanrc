@@ -1,0 +1,4 @@
+fileignoreconfig:
+- filename: vector.toml
+  checksum: 986a05b4e2c0b321f2befe6d19c9937c73d6952cd08725c650a9e2279c176755
+version: "1.0"
