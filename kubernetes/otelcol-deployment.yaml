@@ -16,7 +16,7 @@ spec:
     spec:
       containers:
         - name: otelcol
-          image: 471112575944.dkr.ecr.ap-south-1.amazonaws.com/otelcol:2
+          image: 471112575944.dkr.ecr.ap-south-1.amazonaws.com/otelcol:5
           ports:
             - containerPort: 4318
               name: http
