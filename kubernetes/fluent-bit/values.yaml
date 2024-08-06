@@ -414,7 +414,10 @@ config:
         Match                *
         Host                 otelcol.default.svc.cluster.local
         Port                 4318
-        add_label            color blue
+        Log_response_payload True
+        logs_body_key $message
+        logs_severity_text_message_key loglevel
+        logs_severity_number_message_key lognum
 
   ## https://docs.fluentbit.io/manual/administration/configuring-fluent-bit/classic-mode/upstream-servers
   ## This configuration is deprecated, please use `extraFiles` instead.

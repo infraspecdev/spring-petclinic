@@ -5,6 +5,23 @@ receivers:
         endpoint: 0.0.0.0:4317
       http:
         endpoint: 0.0.0.0:4318
+
+processors:
+  attributes:
+    actions:
+      - key: service.name
+        action: insert
+        value: "fluent-bit-service"
+      - key: log.severity_text
+        action: insert
+        from_attribute: loglevel
+      - key: log.severity_number
+        action: insert
+        from_attribute: lognum
+  batch:
+    timeout: 5s
+    send_batch_size: 1024
+
 exporters:
   debug:
     verbosity: detailed
@@ -24,4 +41,5 @@ service:
       exporters: [ debug, clickhouse ]
     logs:
       receivers: [ otlp ]
+      processors: [attributes, batch]
       exporters: [ debug, clickhouse ]
