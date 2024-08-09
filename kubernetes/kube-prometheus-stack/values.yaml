@@ -20,7 +20,7 @@ kubeVersionOverride: ""
 
 ## Provide a name to substitute for the full names of resources
 ##
-fullnameOverride: ""
+fullnameOverride: kubepromstack
 
 ## Labels to apply to all resources
 ##
@@ -265,7 +265,7 @@ alertmanager:
 
   ## Deploy alertmanager
   ##
-  enabled: true
+  enabled: false
 
   ## Annotations for Alertmanager
   ##
@@ -949,7 +949,7 @@ alertmanager:
 ## Using default values from https://github.com/grafana/helm-charts/blob/main/charts/grafana/values.yaml
 ##
 grafana:
-  enabled: false
+  enabled: true
   namespaceOverride: ""
 
   ## ForceDeployDatasources Create datasource configmap even if grafana deployment has been disabled
@@ -1020,15 +1020,15 @@ grafana:
 
   # # To make Grafana persistent (Using Statefulset)
   # #
-  # persistence:
-  #   enabled: true
-  #   type: sts
-  #   storageClassName: "storageClassName"
-  #   accessModes:
-  #     - ReadWriteOnce
-  #   size: 20Gi
-  #   finalizers:
-  #     - kubernetes.io/pvc-protection
+  persistence:
+    enabled: true
+    type: sts
+    storageClassName: gp3
+    accessModes:
+     - ReadWriteOnce
+    size: 8Gi
+    finalizers:
+     - kubernetes.io/pvc-protection
 
   serviceAccount:
     create: true
@@ -3786,16 +3786,16 @@ prometheus:
     ## Prometheus StorageSpec for persistent data
     ## ref: https://github.com/prometheus-operator/prometheus-operator/blob/main/Documentation/user-guides/storage.md
     ##
-    storageSpec: {}
+    storageSpec:
     ## Using PersistentVolumeClaim
     ##
-    #  volumeClaimTemplate:
-    #    spec:
-    #      storageClassName: gluster
-    #      accessModes: ["ReadWriteOnce"]
-    #      resources:
-    #        requests:
-    #          storage: 50Gi
+      volumeClaimTemplate:
+        spec:
+          storageClassName: gp3
+          accessModes: ["ReadWriteOnce"]
+          resources:
+            requests:
+              storage: 50Gi
     #    selector: {}
 
     ## Using tmpfs volume
